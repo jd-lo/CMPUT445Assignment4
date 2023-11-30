@@ -14,10 +14,10 @@ from Policy import Policy
 from board import GoBoard
 from math import log as ln, sqrt
 from time import time
-from board_base import opponent, EMPTY
+from board_base import EMPTY
 
 
-class searchNode:
+class Node:
 
     expConstant = sqrt(2)
 
@@ -26,7 +26,7 @@ class searchNode:
         self.parent = parent
         self.moveIndex = index
         self.children = []
-        self.unexplored = unexplored #TODO: Implement get_legal_moves
+        self.unexplored = unexplored
         self.visits = 0
         self.wins = 0
     
@@ -53,7 +53,7 @@ class MCTS:
     policy = ...
 
     def __init__(self, board: GoBoard, timeLimit: int):
-        self.root = searchNode(board.last_move, parent = None, moves = board.get_legal_moves())
+        self.root = Node(board.last_move, parent = None, moves = board.get_legal_moves()) #TODO: Impletment get_legal_moves
         self.state = board
 
         #Add small buffer to be extra safe and avoid timing out.
@@ -104,7 +104,7 @@ class MCTS:
         else:
             return 0
 
-    def backPropagate(self, node: searchNode, outcome) -> None:
+    def backPropagate(self, node: Node, outcome) -> None:
         '''
         The "Update/BackProp" phase of MCTS. Undoes any moves made during traversal.
         args:
@@ -120,7 +120,7 @@ class MCTS:
             #Undo move (eventually getting back to original position)
             self.state.undo()
     
-    def traverse(self, node: searchNode) -> searchNode:
+    def traverse(self, node: Node) -> Node:
         '''
         The "Selection" and "Expansion" phase of MCTS. Plays moves on the board
         Recursive implementation to find the best node to explore next based of UCB score.
@@ -130,7 +130,7 @@ class MCTS:
             selectedMove: int = node.unexploredMoves.pop(0)
             self.state.play_move(selectedMove, self.state.current_player)
 
-            newLeaf = searchNode(selectedMove, parent = node, moves = node.unexploredMoves)
+            newLeaf = Node(selectedMove, parent = node, moves = node.unexploredMoves)
             node.children.append(newLeaf)
 
             return newLeaf
