@@ -119,9 +119,6 @@ class GoBoard(object):
         """
         if point == PASS:
             return True
-        #board_copy: GoBoard = self.copy()
-        #can_play_move = board_copy.play_move(point, color)
-        #return can_play_move
         return self.board[point] == EMPTY
 
     def end_of_game(self) -> bool:
